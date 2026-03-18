@@ -1,0 +1,14 @@
+# ACP session handoffs
+.agent/
+.agents/
+.collab/
+.ccx/
+.venv/
+__pycache__/
+.pytest_cache/
+dist/
+build/
+target/
+output/
+tmp/
+.DS_Store

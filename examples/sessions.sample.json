@@ -1,0 +1,59 @@
+[
+  {
+    "session_id": "session-cc-auth",
+    "window_id": "1001",
+    "tab_id": "2001",
+    "miniaturized": false,
+    "title": "CC | repo-auth | auth fix",
+    "badge": "cc",
+    "cwd": "/Users/me/work/repo-auth/feature/auth",
+    "repo_name": "repo-auth",
+    "foreground_command": "claude",
+    "session_type": "cc",
+    "last_active_at": 1710000123,
+    "score_hints": {
+      "exact_type": true,
+      "exact_repo": true,
+      "exact_path_segment": true,
+      "recently_active": true
+    }
+  },
+  {
+    "session_id": "session-cx-api",
+    "window_id": "1002",
+    "tab_id": "2002",
+    "miniaturized": false,
+    "title": "CX | repo-api | api tests",
+    "badge": "cx",
+    "cwd": "/Users/me/work/repo-api/tests/api",
+    "repo_name": "repo-api",
+    "foreground_command": "codex",
+    "session_type": "cx",
+    "last_active_at": 1710000022,
+    "score_hints": {
+      "exact_type": true,
+      "exact_repo": true,
+      "exact_path_segment": true,
+      "recently_active": true
+    }
+  },
+  {
+    "session_id": "session-review",
+    "window_id": "1003",
+    "tab_id": "2003",
+    "miniaturized": false,
+    "title": "CC | repo-review | review",
+    "badge": "review",
+    "cwd": "/Users/me/work/repo-review/notes",
+    "repo_name": "repo-review",
+    "foreground_command": "claude",
+    "session_type": "cc",
+    "last_active_at": 1709999999,
+    "score_hints": {
+      "exact_type": true,
+      "exact_repo": false,
+      "exact_path_segment": false,
+      "recently_active": true
+    }
+  }
+]

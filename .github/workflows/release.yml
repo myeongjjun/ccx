@@ -1,0 +1,103 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: macos-latest
+    env:
+      APP_NAME: ccx
+      HOMEBREW_TAP_REPOSITORY: ${{ vars.HOMEBREW_TAP_REPOSITORY }}
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run release checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo clippy --all-targets -- -D warnings
+          cargo test
+
+      - name: Validate tag and manifest versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          cargo_version="$(python3 -c 'import tomllib; print(tomllib.load(open("Cargo.toml", "rb"))["package"]["version"])')"
+
+          test "$cargo_version" = "$version"
+
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release create "$GITHUB_REF_NAME" \
+              --title "${APP_NAME} ${GITHUB_REF_NAME}" \
+              --generate-notes
+          fi
+
+      - name: Calculate source archive checksum
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive_url="https://github.com/${GITHUB_REPOSITORY}/archive/refs/tags/${GITHUB_REF_NAME}.tar.gz"
+          curl -fsSL "$archive_url" -o source.tar.gz
+          echo "sha256=$(shasum -a 256 source.tar.gz | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Check out Homebrew tap
+        if: ${{ env.HOMEBREW_TAP_REPOSITORY != '' && env.HOMEBREW_TAP_TOKEN != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.HOMEBREW_TAP_REPOSITORY }}
+          token: ${{ env.HOMEBREW_TAP_TOKEN }}
+          path: homebrew-tap
+
+      - name: Render formula
+        if: ${{ env.HOMEBREW_TAP_REPOSITORY != '' && env.HOMEBREW_TAP_TOKEN != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner_repo="${GITHUB_REPOSITORY}"
+          owner="${owner_repo%%/*}"
+          repo="${owner_repo##*/}"
+          ./scripts/render-homebrew-formula.sh \
+            "$owner" \
+            "$repo" \
+            "$GITHUB_REF_NAME" \
+            "${{ steps.source.outputs.sha256 }}" \
+            "homebrew-tap/Formula/ccx.rb"
+
+      - name: Commit and push formula update
+        if: ${{ env.HOMEBREW_TAP_REPOSITORY != '' && env.HOMEBREW_TAP_TOKEN != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd homebrew-tap
+          if git diff --quiet -- Formula/ccx.rb; then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/ccx.rb
+          git commit -m "ccx ${GITHUB_REF_NAME}"
+          git push
