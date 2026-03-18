@@ -1,6 +1,6 @@
 [package]
 name = "ccx"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "iTerm2 session launcher focused on Claude Code and Codex workflows"
 rust-version = "1.82"
