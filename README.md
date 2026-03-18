@@ -6,47 +6,10 @@
 
 ### Homebrew
 
-Source repository:
-
-```text
-https://github.com/myeongjjun/ccx
-```
-
-Once you publish a Homebrew tap, the install path will look like:
-
 ```bash
-brew tap <owner>/tap
+brew tap myeongjjun/ccx
 brew install ccx
 ```
-
-Or, with a direct formula reference:
-
-```bash
-brew install <tap>/ccx
-```
-
-The initial Homebrew formula is source-based. It installs Rust as a build dependency and runs `cargo install` during formula install. This keeps the first public release simple before you decide whether to add bottles.
-
-The source repository is already public, but Homebrew still requires a separate tap repository if you want `brew install` to work directly.
-
-Before that, the practical local test path is source install:
-
-```bash
-cargo install --path .
-ccx
-ccx ccx
-```
-
-If you want to test Homebrew before publishing, use a local formula or private tap that points to your local or private source archive. For most pre-release testing, `cargo install --path .` is simpler and exercises the same `ccx` command name.
-
-What the release workflow expects:
-
-- a Git tag such as `v0.1.0`
-- a matching `Cargo.toml` version
-- optional repository variable `HOMEBREW_TAP_REPOSITORY`
-- optional repository secret `HOMEBREW_TAP_TOKEN`
-
-If the tap repository and token are configured, the release workflow renders `Formula/ccx.rb` into the tap and pushes the update automatically.
 
 ### From Source
 
@@ -80,7 +43,6 @@ Requirements:
 Install and run the first real workflow:
 
 ```bash
-cargo install --path .
 ccx
 ccx ccx
 ```
@@ -116,6 +78,12 @@ ccx isolate-tui
 - if the cache is missing, it runs `collect` and creates it
 - if the cache is stale, it returns immediately and refreshes in the background
 - use `--refresh-now` to force a fresh collect before running a command
+
+Source repository:
+
+```text
+https://github.com/myeongjjun/ccx
+```
 
 ## Supporting CLI
 
@@ -270,9 +238,9 @@ Default flow:
 Required GitHub configuration for tap updates:
 
 - repository variable `HOMEBREW_TAP_REPOSITORY`
-  - example: `your-org/homebrew-tap`
+  - value: `myeongjjun/homebrew-ccx`
 - repository secret `HOMEBREW_TAP_TOKEN`
-  - token with write access to the tap repo
+  - token with write access to `myeongjjun/homebrew-ccx`
 
 The tap formula renderer lives at [`./scripts/render-homebrew-formula.sh`](./scripts/render-homebrew-formula.sh).
 
