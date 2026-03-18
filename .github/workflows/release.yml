@@ -92,7 +92,7 @@ jobs:
         run: |
           set -euo pipefail
           cd homebrew-tap
-          if git diff --quiet -- Formula/ccx.rb; then
+          if [[ -z "$(git status --porcelain -- Formula/ccx.rb)" ]]; then
             exit 0
           fi
 
